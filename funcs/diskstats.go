@@ -2,11 +2,12 @@ package funcs
 
 import (
 	"fmt"
-	"github.com/open-falcon/common/model"
-	"github.com/toolkits/nux"
 	"log"
 	"strings"
 	"sync"
+
+	"github.com/open-falcon/common/model"
+	"github.com/toolkits/nux"
 )
 
 var (
@@ -14,6 +15,7 @@ var (
 	dsLock       = new(sync.RWMutex)
 )
 
+// 内存中刷新最新的两条磁盘状态
 func UpdateDiskStats() error {
 	dsList, err := nux.ListDiskStats()
 	if err != nil {
@@ -24,6 +26,7 @@ func UpdateDiskStats() error {
 	defer dsLock.Unlock()
 	for i := 0; i < len(dsList); i++ {
 		device := dsList[i].Device
+		// 用历史最新值和最新采集值更新数据
 		diskStatsMap[device] = [2]*nux.DiskStats{dsList[i], diskStatsMap[device][0]}
 	}
 	return nil

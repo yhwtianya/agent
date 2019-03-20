@@ -1,9 +1,10 @@
 package funcs
 
 import (
+	"sync"
+
 	"github.com/open-falcon/common/model"
 	"github.com/toolkits/nux"
-	"sync"
 )
 
 const (
@@ -15,6 +16,7 @@ var (
 	psLock          = new(sync.RWMutex)
 )
 
+// 内存中刷新最新的两个CPU状态
 func UpdateCpuStat() error {
 	ps, err := nux.CurrentProcStat()
 	if err != nil {
@@ -27,6 +29,7 @@ func UpdateCpuStat() error {
 		procStatHistory[i] = procStatHistory[i-1]
 	}
 
+	// index 0为最新值
 	procStatHistory[0] = ps
 	return nil
 }
@@ -143,6 +146,7 @@ func CurrentCpuSwitches() uint64 {
 	return procStatHistory[0].Ctxt
 }
 
+// 确保内存有两条历史数据
 func CpuPrepared() bool {
 	psLock.RLock()
 	defer psLock.RUnlock()

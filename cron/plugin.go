@@ -1,14 +1,16 @@
 package cron
 
 import (
-	"github.com/open-falcon/agent/g"
-	"github.com/open-falcon/agent/plugins"
-	"github.com/open-falcon/common/model"
 	"log"
 	"strings"
 	"time"
+
+	"github.com/open-falcon/agent/g"
+	"github.com/open-falcon/agent/plugins"
+	"github.com/open-falcon/common/model"
 )
 
+// 与Hbs同步插件信息，运行插件
 func SyncMinePlugins() {
 	if !g.Config().Plugin.Enabled {
 		return
@@ -25,6 +27,7 @@ func SyncMinePlugins() {
 	go syncMinePlugins()
 }
 
+// 同步并调度插件
 func syncMinePlugins() {
 
 	var (

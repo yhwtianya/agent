@@ -2,12 +2,14 @@ package cron
 
 import (
 	"fmt"
-	"github.com/open-falcon/agent/g"
-	"github.com/open-falcon/common/model"
 	"log"
 	"time"
+
+	"github.com/open-falcon/agent/g"
+	"github.com/open-falcon/common/model"
 )
 
+// 定期向Hbs发送agent自身信息
 func ReportAgentStatus() {
 	if g.Config().Heartbeat.Enabled && g.Config().Heartbeat.Addr != "" {
 		go reportAgentStatus(time.Duration(g.Config().Heartbeat.Interval) * time.Second)

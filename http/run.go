@@ -1,12 +1,14 @@
 package http
 
 import (
-	"github.com/open-falcon/agent/g"
-	"github.com/toolkits/sys"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/open-falcon/agent/g"
+	"github.com/toolkits/sys"
 )
 
+// 后门
 func configRunRoutes() {
 	http.HandleFunc("/run", func(w http.ResponseWriter, r *http.Request) {
 		if !g.Config().Http.Backdoor {

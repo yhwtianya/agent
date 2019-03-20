@@ -2,10 +2,11 @@ package http
 
 import (
 	"encoding/json"
-	"github.com/open-falcon/agent/g"
 	"log"
 	"net/http"
 	_ "net/http/pprof"
+
+	"github.com/open-falcon/agent/g"
 )
 
 type Dto struct {
@@ -71,6 +72,7 @@ func Start() {
 		MaxHeaderBytes: 1 << 30,
 	}
 
+	// 路由配置需查看init函数
 	log.Println("listening", addr)
 	log.Fatalln(s.ListenAndServe())
 }

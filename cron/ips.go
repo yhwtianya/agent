@@ -1,12 +1,14 @@
 package cron
 
 import (
-	"github.com/open-falcon/agent/g"
-	"github.com/open-falcon/common/model"
 	"log"
 	"time"
+
+	"github.com/open-falcon/agent/g"
+	"github.com/open-falcon/common/model"
 )
 
+// 同步信任ips列表
 func SyncTrustableIps() {
 	if g.Config().Heartbeat.Enabled && g.Config().Heartbeat.Addr != "" {
 		go syncTrustableIps()

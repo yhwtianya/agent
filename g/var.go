@@ -53,6 +53,7 @@ func InitRpcClients() {
 	}
 }
 
+// 发送监测数据到transfer
 func SendToTransfer(metrics []*model.MetricValue) {
 	if len(metrics) == 0 {
 		return
@@ -77,12 +78,14 @@ var (
 	reportUrlsLock = new(sync.RWMutex)
 )
 
+// 获取url监测指标
 func ReportUrls() map[string]string {
 	reportUrlsLock.RLock()
 	defer reportUrlsLock.RUnlock()
 	return reportUrls
 }
 
+// 设置url监测指标
 func SetReportUrls(urls map[string]string) {
 	reportUrlsLock.RLock()
 	defer reportUrlsLock.RUnlock()

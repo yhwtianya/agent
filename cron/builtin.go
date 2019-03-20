@@ -1,20 +1,23 @@
 package cron
 
 import (
-	"github.com/open-falcon/agent/g"
-	"github.com/open-falcon/common/model"
 	"log"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/open-falcon/agent/g"
+	"github.com/open-falcon/common/model"
 )
 
+// 同步内置监测指标
 func SyncBuiltinMetrics() {
 	if g.Config().Heartbeat.Enabled && g.Config().Heartbeat.Addr != "" {
 		go syncBuiltinMetrics()
 	}
 }
 
+// 周期同步内置监测指标，url、port、procs、du四类监测指标
 func syncBuiltinMetrics() {
 
 	var timestamp int64 = -1
@@ -122,6 +125,7 @@ func syncBuiltinMetrics() {
 			}
 		}
 
+		// 将监测指标保存到全局变量
 		g.SetReportUrls(urls)
 		g.SetReportPorts(ports)
 		g.SetReportProcs(procs)

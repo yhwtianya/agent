@@ -8,6 +8,7 @@ import (
 	"github.com/open-falcon/common/model"
 )
 
+// 每秒刷新内存中的CPU和磁盘信息
 func InitDataHistory() {
 	for {
 		funcs.UpdateCpuStat()
@@ -16,6 +17,7 @@ func InitDataHistory() {
 	}
 }
 
+// 周期执行内置监测
 func Collect() {
 
 	if !g.Config().Transfer.Enabled {
@@ -31,6 +33,7 @@ func Collect() {
 	}
 }
 
+// 周期性执行监测，并过滤ignore指标
 func collect(sec int64, fns []func() []*model.MetricValue) {
 	t := time.NewTicker(time.Second * time.Duration(sec)).C
 	for {
@@ -55,6 +58,7 @@ func collect(sec int64, fns []func() []*model.MetricValue) {
 			}
 
 			for _, mv := range items {
+				//先监测，然后再过滤监测指标
 				if b, ok := ignoreMetrics[mv.Metric]; ok && b {
 					continue
 				} else {
@@ -63,6 +67,7 @@ func collect(sec int64, fns []func() []*model.MetricValue) {
 			}
 		}
 
+		// 增加Endpoint、Step、Timestamp字段
 		now := time.Now().Unix()
 		for j := 0; j < len(mvs); j++ {
 			mvs[j].Step = sec

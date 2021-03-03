@@ -32,6 +32,7 @@ func syncBuiltinMetrics() {
 		var paths = []string{}
 		var procs = make(map[string]map[int]string)
 		var urls = make(map[string]string)
+		var logs = make(map[string]map[int]string)
 
 		hostname, err := g.Hostname()
 		if err != nil {
@@ -123,6 +124,27 @@ func syncBuiltinMetrics() {
 
 				procs[metric.Tags] = tmpMap
 			}
+
+			if metric.Metric == g.LOG_MONITOR {
+				// 从tags中解析filepath和keywords，保存到logs，logs保存多个logmonitor，key为tags字符串。logs最后保存到全局变量reportLogs
+				// tags: filepath=/opt/deploy/tiantian/log/tiantian.log,keywords=\[W\]
+				arr := strings.Split(metric.Tags, ",")
+				if len(arr) != 2 {
+					continue
+				}
+
+				tmpMap := make(map[int]string)
+
+				for i := 0; i < len(arr); i++ {
+					if strings.HasPrefix(arr[i], "filepath=") {
+						tmpMap[1] = strings.TrimSpace(arr[i][9:])
+					} else if strings.HasPrefix(arr[i], "keywords=") {
+						tmpMap[2] = strings.TrimSpace(arr[i][9:])
+					}
+				}
+
+				logs[metric.Tags] = tmpMap
+			}
 		}
 
 		// 将监测指标保存到全局变量
@@ -130,6 +152,7 @@ func syncBuiltinMetrics() {
 		g.SetReportPorts(ports)
 		g.SetReportProcs(procs)
 		g.SetDuPaths(paths)
+		g.SetReportLogs(logs)
 
 	}
 }

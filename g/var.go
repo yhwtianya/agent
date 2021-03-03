@@ -8,6 +8,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/open-falcon/agent/funcs/logmonitor"
 	"github.com/open-falcon/common/model"
 	"github.com/toolkits/slice"
 )
@@ -176,4 +177,54 @@ func IsTrustable(remoteAddr string) bool {
 	}
 
 	return slice.ContainsString(TrustableIps(), ip)
+}
+
+var (
+	// 从tags中解析filepath和keywords，保存到logs，logs保存多个logmonitor，key为tags字符串。logs最后保存到全局变量reportLogs
+	// tags: filepath=/opt/deploy/tiantian/log/tiantian.log,keywords=\[W\]
+	// 保存了所有log监控指标，外层key为tags字符串，内层key取值为1和2，分别对应filepath和keywords的值
+	reportLogs     map[string]map[int]string
+	reportLogsLock = new(sync.RWMutex)
+)
+
+func ReportLogs() map[string]map[int]string {
+	reportLogsLock.RLock()
+	defer reportLogsLock.RUnlock()
+	return reportLogs
+}
+
+// 保存所有log.monitor监控项
+func SetReportLogs(logs map[string]map[int]string) {
+	reportLogsLock.Lock()
+	defer reportLogsLock.Unlock()
+	reportLogs = logs
+}
+
+var (
+	// newKey := fmt.Sprintf("%s::::::%d", filepath, timestamp)
+	// 全局变量，保存了所有monitor 外层key为filepath::::::timestamp，timestamp为最后一次监控时的时间戳，value为对应Monitor
+	// logTimeMap在每次内部调用LogMetrics时，都会更新所有key的时间戳，如果key是时间戳长时间没更新，说明此monitor可能被删除了，可以在内存中删除
+	// CheckLogMonitor函数就是周期检查过期log.monitor的函数
+	// logTimeMap只有一级key，直接代表filepath，没有keywords级别的key。
+	logTimeMap     = make(map[string]*logmonitor.Monitor)
+	logTimeMapLock = new(sync.RWMutex)
+)
+
+func GetLogTimeMap() map[string]*logmonitor.Monitor {
+	logTimeMapLock.RLock()
+	defer logTimeMapLock.RUnlock()
+	return logTimeMap
+}
+
+func SetLogTimeMap(key string, monitor *logmonitor.Monitor) {
+	logTimeMapLock.Lock()
+	defer logTimeMapLock.Unlock()
+	logTimeMap[key] = monitor
+}
+
+// logTimeMap中删除指定监控
+func UpdateLogTimeMap(key string) {
+	logTimeMapLock.Lock()
+	defer logTimeMapLock.Unlock()
+	delete(logTimeMap, key)
 }

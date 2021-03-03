@@ -60,5 +60,11 @@ func BuildMappers() {
 			},
 			Interval: interval,
 		},
+		FuncsAndInterval{
+			Fs: []func() []*model.MetricValue{
+				LogMetrics,
+			},
+			Interval: interval,
+		},
 	}
 }

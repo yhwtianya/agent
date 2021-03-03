@@ -43,6 +43,7 @@ func main() {
 	cron.SyncBuiltinMetrics()
 	cron.SyncTrustableIps()
 	cron.Collect()
+    cron.CheckLogMonitor()
 
 	go http.Start()
 
